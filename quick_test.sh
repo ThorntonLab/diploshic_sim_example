@@ -5,7 +5,7 @@
 mspms 50 50 -t 1000 -r 1000 10000 > neutral_data_msprime.txt
 
 # Make the feature 
-python diploSHIC.py fvecSim haploid neutral_data_msprime.txt neutral_data_msprime_features.txt
+python3 diploSHIC.py fvecSim haploid neutral_data_msprime.txt neutral_data_msprime_features.txt
 
 # You have to make and maintain all the directories yourself:
 if [ ! -d hardTraining ]
@@ -24,6 +24,10 @@ fi
 
 
 WIN=0
+if [ -e commands.txt ]
+then
+    rm -f commands.txt
+fi
 for x in $(seq 0 0.1 1)
 do
     echo $WIN $x
@@ -31,8 +35,8 @@ do
     ~/src/discoal/discoal 50 50 1000 -ws 0 -a 1000 -x $x -t 1000 -r 1000 > hard_$WIN.discoal
     ~/src/discoal/discoal 50 50 1000 -ws 0 -a 1000 -x $x -f 0.1 -t 1000 -r 1000 > soft_$WIN.discoal
     #The file names cannot have multiple _ in them
-    python diploSHIC.py fvecSim haploid hard_$WIN.discoal hardTraining/hard_$WIN.txt
-    python diploSHIC.py fvecSim haploid soft_$WIN.discoal softTraining/soft_$WIN.txt
+    python3 diploSHIC.py fvecSim haploid hard_$WIN.discoal hardTraining/hard_$WIN.txt
+    python3 diploSHIC.py fvecSim haploid soft_$WIN.discoal softTraining/soft_$WIN.txt
     WIN=$(($WIN+1))
 done
 
@@ -44,6 +48,15 @@ else
     rm -f training_out/*
 fi
 
-python diploSHIC.py makeTrainingSets neutral_data_msprime_features.txt hardTraining/hard softTraining/soft 5 0,1,2,3,4,6,7,8,9,10 training_out
+python3 diploSHIC.py makeTrainingSets neutral_data_msprime_features.txt hardTraining/hard softTraining/soft 5 0,1,2,3,4,6,7,8,9,10 training_out
     
-python diploSHIC.py train training_out/ training_out/ modelfile.txt
+python3 diploSHIC.py train training_out/ training_out/ modelfile.txt
+
+# As of Aug 22, things work for KRT up until now.
+
+# Attempting to get a real data set analyzed is failing for me.
+# My attempt is:
+~/src/discoal/discoal 50 1 1000 -ws 0 -a 1000 -x 0.9 -t 1000 -r 1000 > data.discoal
+python3 diploSHIC.py fvecSim haploid data.discoal data.txt
+python3 diploSHIC.py predict modelfile.txt.json  modelfile.txt.weights.hdf5 data.txt data.pred
+
