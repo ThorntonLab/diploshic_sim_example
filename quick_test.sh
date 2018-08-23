@@ -54,9 +54,4 @@ python3 diploSHIC.py train training_out/ training_out/ modelfile.txt
 
 # As of Aug 22, things work for KRT up until now.
 
-# Attempting to get a real data set analyzed is failing for me.
-# My attempt is:
-~/src/discoal/discoal 50 1 1000 -ws 0 -a 1000 -x 0.9 -t 1000 -r 1000 > data.discoal
-python3 diploSHIC.py fvecSim haploid data.discoal data.txt
-python3 diploSHIC.py predict modelfile.txt.json  modelfile.txt.weights.hdf5 data.txt data.pred
-
+bash predict.sh
